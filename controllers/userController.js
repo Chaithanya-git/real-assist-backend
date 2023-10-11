@@ -54,6 +54,7 @@ const generateReport = async (req, res) => {
         "--single-process",
       ],
     });
+    console.log(puppeteer.executablePath());
     const page = await browser.newPage();
     await page.goto(
       "https://real-assist-backend-d02ec0b0906c.herokuapp.com/report",
