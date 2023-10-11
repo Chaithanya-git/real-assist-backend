@@ -38,6 +38,7 @@ const generateReport = async (req, res) => {
     requestBody = req.body;
     const browser = await puppeteer.launch({
       headless: true,
+      executablePath: puppeteer.executablePath(),
       args: [
         "--disable-gpu",
         "--disable-dev-shm-usage",
