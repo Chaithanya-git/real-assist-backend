@@ -36,7 +36,7 @@ const loadReport = async (req, res) => {
 const generateReport = async (req, res) => {
   try {
     requestBody = req.body;
-    const browser = await puppeteer.launch({ headless: "new" });
+    const browser = await puppeteer.launch({ headless: true });
     const page = await browser.newPage();
     await page.goto("http://localhost:5000/report", {
       waitUntil: "networkidle2",
