@@ -50,9 +50,12 @@ const generateReport = async (req, res) => {
       ],
     });
     const page = await browser.newPage();
-    await page.goto("http://localhost:5000/report", {
-      waitUntil: "networkidle2",
-    });
+    await page.goto(
+      "https://real-assist-backend-d02ec0b0906c.herokuapp.com/report",
+      {
+        waitUntil: "networkidle2",
+      }
+    );
 
     await page.setViewport({ width: 595, height: 842 });
 
