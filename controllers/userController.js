@@ -41,6 +41,7 @@ const generateReport = async (req, res) => {
       args: [
         "--disable-gpu",
         "--disable-dev-shm-usage",
+        "--disable-web-security",
         "--disable-setuid-sandbox",
         "--no-first-run",
         "--no-sandbox",
@@ -91,7 +92,7 @@ const generateReport = async (req, res) => {
     // });
   } catch (error) {
     console.log(error.message);
-    res.status(500).json({ error: error.message });
+    res.status(500).json({ error: "Failed to generate and send PDF" });
   }
 };
 
