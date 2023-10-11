@@ -36,7 +36,7 @@ const loadReport = async (req, res) => {
 const generateReport = async (req, res) => {
   try {
     requestBody = req.body;
-    const browser = await puppeteer.launch();
+    const browser = await puppeteer.launch({ headless: "new" });
     const page = await browser.newPage();
     await page.goto("http://localhost:5000/report", {
       waitUntil: "networkidle2",
@@ -50,7 +50,7 @@ const generateReport = async (req, res) => {
       path: `${path.join(
         __dirname,
         "../public/files",
-        todayDate.getTime() + ".pdf",
+        todayDate.getTime() + ".pdf"
       )}`,
       printBackground: true,
       format: "A4",
@@ -63,7 +63,7 @@ const generateReport = async (req, res) => {
     res.setHeader("Content-Type", "application/pdf");
     res.setHeader(
       "Content-Disposition",
-      `attachment; filename="${pdfFileName}"`,
+      `attachment; filename="${pdfFileName}"`
     );
 
     res.send(pdfBuffer);
