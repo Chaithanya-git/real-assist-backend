@@ -36,7 +36,19 @@ const loadReport = async (req, res) => {
 const generateReport = async (req, res) => {
   try {
     requestBody = req.body;
-    const browser = await puppeteer.launch({ headless: true });
+    const browser = await puppeteer.launch({
+      headless: true,
+      args: [
+        "--disable-gpu",
+        "--disable-dev-shm-usage",
+        "--disable-setuid-sandbox",
+        "--no-first-run",
+        "--no-sandbox",
+        "--no-zygote",
+        "--disabled-setupid-sandbox",
+        "--single-process",
+      ],
+    });
     const page = await browser.newPage();
     await page.goto("http://localhost:5000/report", {
       waitUntil: "networkidle2",
