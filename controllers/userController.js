@@ -1,7 +1,27 @@
 const puppeteer = require("puppeteer");
-const path = require("path");
+const firebase = require("firebase/app");
+const {
+  getStorage,
+  ref,
+  uploadBytes,
+  getDownloadURL,
+} = require("firebase/storage");
+require("firebase/storage");
+require("dotenv").config();
 
 var requestBody;
+
+const firebaseConfig = {
+  apiKey: "AIzaSyAemk7Q3-SeVUIdnYVO0ID8oUbPwstNxHg",
+  authDomain: "real-assist-backend.firebaseapp.com",
+  projectId: "real-assist-backend",
+  storageBucket: "real-assist-backend.appspot.com",
+  messagingSenderId: "484526291440",
+  appId: "1:484526291440:web:f83bf81e8155968be7c535",
+};
+
+firebase.initializeApp(firebaseConfig);
+const storage = getStorage();
 
 const loadReport = async (req, res) => {
   try {
@@ -37,26 +57,19 @@ const generateReport = async (req, res) => {
   try {
     requestBody = req.body;
     const browser = await puppeteer.launch({
-      headless: true,
-      executablePath: puppeteer.executablePath(),
       args: [
-        "--disable-gpu",
-        "--disable-dev-shm-usage",
-        "--disable-web-security",
-        "--disable-features=IsolateOrigins",
-        "--disable-site-isolation-trials",
-        "--disable-features=BlockInsecurePrivateNetworkRequests",
         "--disable-setuid-sandbox",
-        "--no-first-run",
         "--no-sandbox",
-        "--no-zygote",
-        "--disabled-setupid-sandbox",
         "--single-process",
+        "--no-zygote",
       ],
+      executablePath:
+        process.env.NODE_ENV === "production"
+          ? process.env.PUPPETEER_EXECUTABLE_PATH
+          : puppeteer.executablePath(),
     });
-    console.log(puppeteer.executablePath());
     const page = await browser.newPage();
-    await page.goto("/report", {
+    await page.goto("https://real-assist-backend.onrender.com/api/report", {
       waitUntil: "networkidle2",
     });
 
@@ -65,11 +78,6 @@ const generateReport = async (req, res) => {
     const todayDate = new Date();
 
     const pdfBuffer = await page.pdf({
-      path: `${path.join(
-        __dirname,
-        "../public/files",
-        todayDate.getTime() + ".pdf"
-      )}`,
       printBackground: true,
       format: "A4",
     });
@@ -78,23 +86,17 @@ const generateReport = async (req, res) => {
 
     const pdfFileName = todayDate.getTime() + ".pdf";
 
-    res.setHeader("Content-Type", "application/pdf");
-    res.setHeader(
-      "Content-Disposition",
-      `attachment; filename="${pdfFileName}"`
-    );
+    // created firebase storage for pdfs
+    const storageRef = ref(storage, `pdfs/${pdfFileName}`);
 
-    res.send(pdfBuffer);
+    await uploadBytes(storageRef, pdfBuffer);
 
-    // res.download(pdfURL, function (err) {
-    //   if (errr) {
-    //     console.log(errr);
-    //   } else {
-    //   }
-    // });
+    const pdfURL = await getDownloadURL(storageRef);
+
+    res.status(200).json({ pdfURL });
   } catch (error) {
     console.log(error.message);
-    res.status(500).json({ error: error.message });
+    res.status(500).json({ error: "Failed to generate and send PDF" });
   }
 };
 
