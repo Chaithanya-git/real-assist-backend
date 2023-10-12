@@ -69,9 +69,12 @@ const generateReport = async (req, res) => {
           : puppeteer.executablePath(),
     });
     const page = await browser.newPage();
-    await page.goto("https://real-assist-backend.onrender.com/api/report", {
-      waitUntil: "networkidle2",
-    });
+    await page.goto(
+      "https://real-assist-backend-kfg7.onrender.com/api/report",
+      {
+        waitUntil: "networkidle2",
+      }
+    );
 
     await page.setViewport({ width: 595, height: 842 });
 
