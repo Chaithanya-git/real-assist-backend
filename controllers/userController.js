@@ -30,6 +30,9 @@ const loadReport = async (req, res) => {
     if (!Array.isArray(requestData)) {
       throw new Error("Request data is not in the expected format.");
     }
+    const today = new Date();
+    const options = { year: "numeric", month: "long", day: "numeric" };
+    const formattedDate = today.toLocaleDateString(undefined, options);
 
     const labels = requestData.map((entry) => entry.data_year.toString());
     const data = requestData.map((entry) => entry.Burglary);
@@ -47,6 +50,7 @@ const loadReport = async (req, res) => {
     };
     res.render("report", {
       chartData: JSON.stringify(chartData),
+      formattedDate: formattedDate,
     });
   } catch (error) {
     res.status(500).send({ success: false, msg: error.message });
